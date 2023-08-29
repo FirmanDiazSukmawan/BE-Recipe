@@ -53,26 +53,19 @@ const userController = {
                     phone_number,
                     role
                 };
-                // console.log (user);
+                console.log(user);
+                const userData = await createUser(user);
 
-                try {
-                    const userData = await createUser(user);
+                res.json({
+                    message: "User has been created successfully",
+                    data: userData,
+                });
 
-                    res.status(201).json({
-                        message: "User has been created successfully",
-                        data: userData,
-                    });
-                } catch (err) {
-                    res.status(500).json({
-                        message: "Error creating user",
-                        error: err.message,
-                    });
-                }
             });
         } catch (err) {
-            res.status(400).json({
-                message: "Error creating user",
-                error: err.message,
+            res.json({
+                message: "Error creating user Catch",
+                err: err.message,
             });
         }
     },
@@ -88,7 +81,7 @@ const userController = {
                 const passwordHash = result.rows[0].password;
                 const PasswordValid = await bcrypt.compare(password, passwordHash);
                 const userRole = result.rows[0].role;
-                console.log(userRole);
+                // console.log(userRole);
 
 
 
@@ -117,39 +110,37 @@ const userController = {
 
     // <<<<<<<<<<<VERSI THEN CATCH>>>>>>>>>>>>
 
-    // login: async (req, res) => {
+
+    // login: (req, res) => {
     //     const { username, password } = req.body;
     //     loginUser(username)
-    //         .then(async (hasil) => {
-    //             const userPassword = hasil.rows[0].password;
-    //             console.log(userPassword);
-    //             if (hasil.rowCount > 0) {
-    //                 const hasilPassword = await bcrypt.compare(password, userPassword);
-    //                 if (hasilPassword) {
-    //                     const token = await generateToken({
-    //                         username: hasil.rows[0].username
+    //         .then((data) => {
+    //             const userRole = data.rows[0].role;
+    //             const userPassword = data.rows[0].password;
+    //             if (data.rowCount > 0) {
+    //                 bcrypt.compare(password, userPassword)
+    //                     .then(async (result) => {
+    //                         console.log(result);
+    //                         if (result) {
+    //                             const token = await generateToken({
+    //                                 role: userRole
+    //                             });
+    //                             res.json({
+    //                                 message: "LOGIN BERHASIL",
+    //                                 generateToken: token
+    //                             });
+    //                         }
+    //                         else {
+    //                             res.json({
+    //                                 message: "LOGIN GAGAL",
+    //                             });
+    //                         }
     //                     });
-    //                     res.json({
-    //                         message: "login succes",
-    //                         generateToken: token,
-    //                         user: username
-
-    //                     });
-    //                 } else {
-    //                     res.json({
-    //                         message: "Login failed",
-    //                     });
-    //                 }
-
     //             }
-    //         })
-    //         .catch((err) => {
-    //             res.json({
-    //                 message: "Data Blank",
-    //                 error: err.message
-    //             });
     //         });
     // },
+
+
 
 
     updateDataUser: async (req, res) => {
