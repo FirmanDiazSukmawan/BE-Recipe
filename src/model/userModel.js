@@ -46,13 +46,14 @@ const loginUser = (username) => {
 
 
 const updateUser = (data, id) => {
-    const { username, password, phone_number, profile_picture, role } = data;
-    return db.query(`UPDATE users SET username='${username}', password='${password}', phone_number='${phone_number}',profile_picture='${profile_picture}',role = ${role} WHERE users.id = ${id}`);
+    const { username, password, phone_number, image, role } = data;
+    return db.query(`UPDATE users SET username='${username}', password='${password}', phone_number='${phone_number}',image='${image}',role = ${role} WHERE users.id = ${id}`);
 };
 
 const deleteUser = (id) => {
     return db.query(`DELETE FROM users WHERE users.id=${id}`);
 };
+
 
 
 

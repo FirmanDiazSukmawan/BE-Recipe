@@ -17,7 +17,7 @@ const multerUpload = multer({
     }),
 
     fileFilter: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
+        // const ext = path.extname(file.originalname);
         const fileSize = parseInt(req.headers["content-length"]);
         const maxSize = 2 * 1024 * 1024;
         if (fileSize > maxSize) {
@@ -26,12 +26,14 @@ const multerUpload = multer({
             };
             return cb(error, false);
         }
-        if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
+        // console.log(file);
+        if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
+
             cb(null, true);
         }
         else {
             const error = {
-                message: "file must be a .png,.jpg or .jpeg"
+                message: "file must be a .png .jpg or .jpeg"
             };
             cb(error, false);
         }
@@ -39,7 +41,7 @@ const multerUpload = multer({
 });
 
 const upload = (req, res, next) => {
-    const multerSingle = multerUpload.single("profile_picture");
+    const multerSingle = multerUpload.single("image");
     multerSingle(req, res, (err) => {
         if (err) {
             res.json({

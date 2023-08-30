@@ -1,6 +1,7 @@
 const { readUser, createUser, updateUser, deleteUser, findById, loginUser } = require("../model/userModel");
 const { generateToken } = require("../helper/jwt");
 const bcrypt = require("bcrypt");
+const cloudinary = require("../config/cloudinaryConfig");
 
 const userController = {
     getUser: async (req, res) => {
@@ -53,14 +54,21 @@ const userController = {
                     phone_number,
                     role
                 };
-                console.log(user);
-                const userData = await createUser(user);
+                // console.log(user);
 
-                res.json({
-                    message: "User has been created successfully",
-                    data: userData,
-                });
+                try {
+                    const userData = await createUser(user);
 
+                    res.json({
+                        message: "User has been created successfully",
+                        data: userData,
+                    });
+                } catch (err) {
+                    res.json({
+                        message: "Error creating user",
+                        err: err.message,
+                    });
+                }
             });
         } catch (err) {
             res.json({
@@ -144,18 +152,22 @@ const userController = {
 
 
     updateDataUser: async (req, res) => {
+
+        const { id } = req.params;
+        const userImage = await cloudinary.uploader.upload(req.file.path, { folder: "users" });
+        // console.log(userImage);
         try {
-            const { id } = req.params;
             const result = await findById(Number(id));
             const user = result.rows[0];
-
             const data = {
-                username: req.body.username || user.username,
-                password: req.body.password || user.password,
-                phone_number: req.body.phone_number || user.phone_numer,
-                profile_picture: req.file.filename || user.profile_picture,
-                role: req.body.role || user.role
+                username: req.body.username ?? user.username,
+                password: req.body.password ?? user.password,
+                phone_number: req.body.phone_number ?? user.phone_numer,
+                image: userImage.secure_url ?? null,
+                role: req.body.role ?? user.role
             };
+
+
 
             await updateUser(data, Number(id));
 
@@ -176,6 +188,7 @@ const userController = {
         try {
             const userId = req.params.id;
             const result = await deleteUser(userId);
+
             res.json({
                 message: "delete data sucessfully",
                 data: `id ${result} has been deleted`

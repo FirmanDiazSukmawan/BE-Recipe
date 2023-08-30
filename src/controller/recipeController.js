@@ -1,5 +1,5 @@
 const { findRecipesId, recipesQuery, createRecipes, updateRecipes, deleteRecipes } = require("../model/recipeModel");
-
+const cloudinary = require("../config/cloudinaryConfig");
 const recipeController = {
 
     getRecipesQuery: async (req, res) => {
@@ -33,7 +33,7 @@ const recipeController = {
 
             let result = await findRecipesId(id);
             res.status(200).json({ data: result.rows });
-            console.log(result);
+            // console.log(result);
         }
         catch (err) {
             res.status(400).json({
@@ -47,24 +47,30 @@ const recipeController = {
 
 
     postRecipes: async (req, res) => {
+        let recipesImage = await cloudinary.uploader.upload(req.file.path, { folder: "recipe" });
+
+        if (!recipesImage) {
+            return res.json({ messsage: "need upload image" });
+        }
 
         try {
             let recipe = {
                 name_recipes: req.body.name_recipes,
-                image_recipes: req.body.image_recipes,
+                image: recipesImage.secure_url,
                 ingredients: req.body.ingredients,
                 users_id: req.body.users_id,
                 category_id: req.body.category_id,
                 description: req.body.description
             };
             let recipeData = await createRecipes(recipe);
+            // console.log(recipe);
             res.status(200).json({
                 message: "create recipe succesfully",
                 data: recipeData.rows
             });
         } catch (err) {
             res.status(400).json({
-                error: err.message,
+                err: err.message,
                 message: "error create recipes"
 
             });
@@ -73,17 +79,26 @@ const recipeController = {
 
     putRecipes: async (req, res) => {
         let { id } = req.params;
-        let recipe = await findRecipesId(Number(id));
-        let data = recipe.rows[0];
-        let recipeData = {
-            name_recipes: req.body.name_recipes || data.name_recipes,
-            image_recipes: req.body.image_recipes || data.image_recipes,
-            ingredients: req.body.ingredients || data.ingredients,
-            users_id: req.body.users_id || data.users_id,
-            category_id: req.body.category_id || data.category_id,
-            description: req.body.description || data.description
-        };
+        let recipesImage = await cloudinary.uploader.upload(req.file.path, { folder: "recipe" });
+
+        if (!recipesImage) {
+            return res.json({ messsage: "need upload image" });
+        }
+
+
         try {
+            let recipe = await findRecipesId(Number(id));
+            let data = recipe.rows[0];
+            // console.log(data);
+            let recipeData = {
+                name_recipes: req.body.name_recipes || data.name_recipes,
+                image: recipesImage.secure_url || data.image,
+                ingredients: req.body.ingredients || data.ingredients,
+                users_id: req.body.users_id || data.users_id,
+                category_id: req.body.category_id || data.category_id,
+                description: req.body.description || data.description
+            };
+            // console.log(recipeData);
             await updateRecipes(recipeData, Number(id));
             res.status(200).json({
                 message: "recipe updated successfully"
