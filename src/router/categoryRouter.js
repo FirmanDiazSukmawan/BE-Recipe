@@ -4,7 +4,7 @@ const { getCategory, getCategoryById, createDataCategory, updateDataCategory, de
 
 router.get("/", getCategory);
 router.get("/:id", getCategoryById);
-router.post("", createDataCategory);
+router.post("/", createDataCategory);
 router.put("/:id", updateDataCategory);
 router.delete("/:id", deleteDataCategory);
 

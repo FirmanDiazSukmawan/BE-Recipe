@@ -2,6 +2,7 @@ const { readUser, createUser, updateUser, deleteUser, findById, loginUser } = re
 const { generateToken } = require("../helper/jwt");
 const bcrypt = require("bcrypt");
 const cloudinary = require("../config/cloudinaryConfig");
+// const redis = require("../config/redisConfig");
 
 const userController = {
     getUser: async (req, res) => {
@@ -25,7 +26,13 @@ const userController = {
         try {
             const id = req.params.id;
             const result = await findById(id);
-            res.json(result.rows);
+            // const dataRedis = redis.set(`getFromRedis/${id}`, JSON.stringify(result), { EX: 180, NX: true });
+            res.json({
+                // fromCache: false,
+                // data: dataRedis
+                data: result.rows[0],
+                message: "get data successfully"
+            });
         }
         catch (err) {
             res.json({
@@ -34,6 +41,25 @@ const userController = {
             });
         }
     },
+
+    // versi then catch redis 
+    // getUserById: (req, res) => {
+    //     const id = req.params.id;
+    //     findById(id)
+    //         .then((result) => {
+    //             const dataRedis = redis.set(`getFromRedis/${id}`, JSON.stringify(result), {
+    //                 EX: 180,
+    //                 NX: true,
+    //             });
+    //             res.send({
+    //                 fromCache: false,
+    //                 data: dataRedis
+    //             });
+    //         })
+    //         .catch((err) => {
+    //             res.json({ message: err.message });
+    //         });
+    // },
 
     createUser: async (req, res) => {
         try {
@@ -153,16 +179,17 @@ const userController = {
 
     updateDataUser: async (req, res) => {
 
-        const { id } = req.params;
-        const userImage = await cloudinary.uploader.upload(req.file.path, { folder: "users" });
-        // console.log(userImage);
+
         try {
+            const { id } = req.params;
+            // console.log(req);
+            const userImage = await cloudinary.uploader.upload(req.file.path, { folder: "users" });
             const result = await findById(Number(id));
             const user = result.rows[0];
             const data = {
                 username: req.body.username ?? user.username,
                 password: req.body.password ?? user.password,
-                phone_number: req.body.phone_number ?? user.phone_numer,
+                phone_number: req.body.phone_number ?? user.phone_number,
                 image: userImage.secure_url ?? null,
                 role: req.body.role ?? user.role
             };
@@ -178,7 +205,7 @@ const userController = {
         } catch (error) {
             res.status(400).json({
                 message: "Update Error",
-                error: error
+                error: error.message
             });
         }
     },
