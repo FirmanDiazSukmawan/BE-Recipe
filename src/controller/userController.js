@@ -1,8 +1,8 @@
-const { readUser, createUser, updateUser, deleteUser, findById, loginUser } = require("../model/userModel");
-const { generateToken } = require("../helper/jwt");
+const { readUser, createUser, updateUser, deleteUser, findById, loginUser, selectPagination, pagination } = require("../model/userModel");
+const { generateToken, refreshToken } = require("../helper/jwt");
 const bcrypt = require("bcrypt");
 const cloudinary = require("../config/cloudinaryConfig");
-// const redis = require("../config/redisConfig");
+const redis = require("../config/redisConfig");
 
 const userController = {
     getUser: async (req, res) => {
@@ -22,16 +22,44 @@ const userController = {
         }
     },
 
+
+    selectPage: async (req, res) => {
+        let { limit, page } = req.query;
+        let pageValue = page ? Number(page) : 1;
+        let limitValue = limit ? Number(limit) : 2;
+        const offsetValue = pageValue === 1 ? 0 : (pageValue - 1) * limitValue;
+        const allData = await selectPagination();
+        const totalData = Number(allData.rows[0].total);
+
+        try {
+            let result = await pagination(limitValue, offsetValue);
+            res.status(200).json({
+                message: "user has been selected by limit and offset",
+                currentPage: pageValue,
+                dataPerPage: limitValue,
+                totalPage: Math.ceil(totalData / limitValue),
+                totalData,
+                data: result.rows
+            });
+        }
+        catch (err) {
+            res.status(400).json({
+                error: err.message,
+            });
+        }
+
+    },
+
     getUserById: async (req, res) => {
         try {
             const id = req.params.id;
             const result = await findById(id);
-            // const dataRedis = redis.set(`getFromRedis/${id}`, JSON.stringify(result), { EX: 180, NX: true });
+            const dataRedis = redis.set(`getFromRedis/${id}`, JSON.stringify(result), { EX: 180, NX: true });
             res.json({
-                // fromCache: false,
-                // data: dataRedis
-                data: result.rows[0],
-                message: "get data successfully"
+                fromCache: false,
+                data: dataRedis
+                // data: result.rows[0],
+                // message: "get data successfully"
             });
         }
         catch (err) {
@@ -115,7 +143,7 @@ const userController = {
                 const passwordHash = result.rows[0].password;
                 const PasswordValid = await bcrypt.compare(password, passwordHash);
                 const userRole = result.rows[0].role;
-                // console.log(userRole);
+                // console.log(userRole);   
 
 
 
@@ -183,7 +211,7 @@ const userController = {
         try {
             const { id } = req.params;
             // console.log(req);
-            const userImage = await cloudinary.uploader.upload(req.file.path, { folder: "users" });
+            const userImage = await cloudinary.uploader.upload(req.file.path, { folder: "user" });
             const result = await findById(Number(id));
             const user = result.rows[0];
             const data = {
@@ -215,10 +243,10 @@ const userController = {
         try {
             const userId = req.params.id;
             const result = await deleteUser(userId);
-
+            const data = await cloudinary.uploader.destroy(result);
             res.json({
                 message: "delete data sucessfully",
-                data: `id ${result} has been deleted`
+                data: `id ${data} has been deleted`
             });
         }
         catch (err) {

@@ -9,6 +9,14 @@ const readUser = (search, sort) => {
     `);
 };
 
+const selectPagination = () => {
+    return db.query("SELECT COUNT(*) AS total FROM users");
+};
+
+const pagination = (limit, offset) => {
+    return db.query(`SELECT *FROM users LIMIT ${limit} OFFSET ${offset}`);
+};
+
 
 const findById = (id) => {
     return db.query(`SELECT * FROM users WHERE users.id=${id}`);
@@ -60,4 +68,4 @@ const deleteUser = (id) => {
 
 
 
-module.exports = { readUser, findById, createUser, loginUser, updateUser, deleteUser, verifyUser };
+module.exports = { readUser, findById, createUser, loginUser, updateUser, deleteUser, verifyUser, selectPagination, pagination };

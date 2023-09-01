@@ -3,7 +3,7 @@ const client = require("../config/redisConfig");
 const hitByID = async (req, res, next) => {
     const id = req.params.id;
     try {
-        const user = await client.get(`getFromRedis ${id}`);
+        const user = await client.get(`getFromRedis/${id}`);
         // console.log(user);
 
         if (user) {

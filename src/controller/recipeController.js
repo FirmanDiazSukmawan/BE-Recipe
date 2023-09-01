@@ -113,11 +113,17 @@ const recipeController = {
     },
 
     deletRecipes: async (req, res) => {
-        let { id } = req.params;
+
+
         try {
-            await deleteRecipes(id);
+            let { id } = req.params;
+            const result = await deleteRecipes(id);
+            const data = await cloudinary.uploader.destroy(result);
+
+
             res.status(200).json({
-                message: "recipe deleted successfully"
+                message: "recipe deleted successfully",
+                data: data
             });
         }
         catch (err) {
