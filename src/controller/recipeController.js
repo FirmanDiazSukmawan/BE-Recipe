@@ -59,9 +59,9 @@ const recipeController = {
     },
 
     findByUsersId: async (req, res) => {
-        const user_id = req.params.user_id;
+        const users_id = req.params.users_id;
         try {
-            const result = await getRecipesByUsersId(user_id);
+            const result = await getRecipesByUsersId(users_id);
             res.status(200).json({data:result.rows});
             console.log(result);
         }
@@ -87,10 +87,9 @@ const recipeController = {
             let recipe = {
                 name_recipes: req.body.name_recipes,
                 image: recipesImage.secure_url,
+                video: req.body.video,
                 ingredients: req.body.ingredients,
                 users_id: req.body.users_id,
-                category_id: req.body.category_id,
-                description: req.body.description
             };
             let recipeData = await createRecipes(recipe);
             // console.log(recipe);
@@ -123,10 +122,8 @@ const recipeController = {
             let recipeData = {
                 name_recipes: req.body.name_recipes || data.name_recipes,
                 image: recipesImage.secure_url || data.image,
+                video: req.body.video || data.video,
                 ingredients: req.body.ingredients || data.ingredients,
-                users_id: req.body.users_id || data.users_id,
-                category_id: req.body.category_id || data.category_id,
-                description: req.body.description || data.description
             };
             // console.log(recipeData);
             await updateRecipes(recipeData, Number(recipe_id));

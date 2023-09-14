@@ -1,95 +1,29 @@
--- Active: 1692600013165@@localhost@5432@db_batch14
 
-SELECT * FROM users 
+CREATE TABLE users (
+  user_id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  phone_number VARCHAR(20),
+  password VARCHAR(255) NOT NULL,
+  image VARCHAR(255) NULL,
+  role INT
+);
 
-INSERT INTO
-    users(
-        id,
-        username,
-        password,
-        email,
-        phone_number
-    )
-VALUES (
-        4,
-        'bambang',
-        '015',
-        'bambang1@gmail.com',
-        '0545'
-    )
 
-CREATE TABLE
-    category (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR NOT NULL
-    )
+CREATE TABLE food_recipe (
+  recipes_id SERIAL PRIMARY KEY,
+  name_recipes VARCHAR(255) NOT NULL,
+  description TEXT,
+  image VARCHAR (255),
+  ingredients TEXT NOT NULL,
+  video VARCHAR NULL,
+  user_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
 
-SELECT *FROM category 
 
-CREATE TABLE
-    food_recipes (
-        id SERIAL PRIMARY KEY,
-        name_recipes VARCHAR(255) NOT NULL,
-        image_recipes VARCHAR(255) NOT NULL,
-        ingredients VARCHAR(255) NOT NULL,
-        users_id INT NOT NULL,
-        category_id INT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (users_id) REFERENCES users (id),
-        FOREIGN KEY(category_id) REFERENCES category (id)
-    )
+DROP TABLE food_recipes;
 
-SELECT *FROM food_recipes 
-
-INSERT INTO
-    food_recipes(
-        name_recipes,
-        image_recipes,
-        ingredients,
-        users_id,
-        category_id,
-        created_at,
-        deleted_at
-    )
-VALUES (
-        'ayam goreng',
-        'url ayam goreng',
-        'ayam+tepung',
-        2,
-        2,
-        current_timestamp,
-        NULL
-    )
-
-ALTER TABLE food_recipes add deleted_at TIMESTAMP DEFAULT NULL;
-
-ALTER TABLE food_recipes add description VARCHAR(255) 
-
-INSERT INTO
-    food_recipes(
-        name_recipes,
-        image_recipes,
-        ingredients,
-        users_id,
-        category_id,
-        created_at,
-        deleted_at,
-        description
-    )
-VALUES (
-        'ayam bakar',
-        'url ayam tes',
-        'ayam+tepung',
-        3,
-        2,
-        'ada apa ini',
-        CURRENT_TIMESTAMP,
-        NULL
-    )
-
-ALTER TABLE users
-add
-    profile_picture VARCHAR(255) NULL,
-add role VARCHAR(255) NULL
-
-ALTER TABLE users add role INTEGER 
+DROP TABLE users;
+DROP TABLE category

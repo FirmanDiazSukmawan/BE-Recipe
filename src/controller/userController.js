@@ -8,7 +8,7 @@ const {
   selectPagination,
   pagination,
   findUserEmail,
-  logoutUser
+  logoutUser,
 } = require("../model/userModel");
 // const { findUserEmail, findUserById, findRecipeById } = require("../middleware/verifyRole");
 const { generateToken, refreshToken } = require("../helper/jwt");
@@ -88,7 +88,7 @@ const userController = {
       const result = await findById(users_id);
       res.json({
         data: result.rows[0],
-        message: "get data successfully"
+        message: "get data successfully",
       });
     } catch (err) {
       res.json({
@@ -98,18 +98,17 @@ const userController = {
     }
   },
 
-  getUserByPayload: async(req,res) => {
-    try{
+  getUserByPayload: async (req, res) => {
+    try {
       const users_id = req.payload.users_id;
       const result = await findById(users_id);
-      res.status(200).json(
-        {
-          message:"user",
-          data:result.rows
-        });
-    } catch(err) {
-      res.status(400).json ({
-        message: "user not found"
+      res.status(200).json({
+        message: "user",
+        data: result.rows,
+      });
+    } catch (err) {
+      res.status(400).json({
+        message: "user not found",
       });
     }
   },
@@ -135,14 +134,20 @@ const userController = {
 
   createUser: async (req, res) => {
     try {
-      const { email, username, password,confirmPassword, phone_number, role } = req.body;
+      const { email, username, password, confirmPassword, phone_number, role } =
+        req.body;
 
-     let {rowCount} = await findUserEmail(email);
-     if (rowCount) {
-        return res.status(400).json ({ message:"email already in use,please use another email"});
-     }
-     if (password !== confirmPassword) return res.status(401).json({ message:"passsword and confirm password do not match"});
-       bcrypt.hash(password, 10, async (err, hash) => {
+      let { rowCount } = await findUserEmail(email);
+      if (rowCount) {
+        return res
+          .status(400)
+          .json({ message: "email already in use,please use another email" });
+      }
+      if (password !== confirmPassword)
+        return res
+          .status(401)
+          .json({ message: "passsword and confirm password do not match" });
+      bcrypt.hash(password, 10, async (err, hash) => {
         if (err) {
           return res.status(500).json({
             message: "Error hashing password",
@@ -187,30 +192,30 @@ const userController = {
 
     try {
       const result = await loginUser(email);
-    //   console.log(result.rows);
+      //   console.log(result.rows);
 
       if (result.rowCount > 0) {
         const passwordHash = result.rows[0].password;
         const PasswordValid = await bcrypt.compare(password, passwordHash);
-        const userRole = result.rows[0].role;
+        const user = result.rows[0];
 
         // console.log(result);
 
         if (PasswordValid) {
           const token = await generateToken({
-            role: userRole,
+            users: user,
           });
 
           return res.status(200).json({
             message: "Login successful",
             token: token,
-            data:result.rows[0]
-                });
+            data: user,
+          });
         } else {
-          res.status(400).json({ message: "Invalid email or password" });
+          res.status(400).json({ message: "Invalid email or password 1" });
         }
       } else {
-        res.status(400).json({ message: "Invalid email or password " });
+        res.status(400).json({ message: "Invalid email or password 2 " });
       }
     } catch (error) {
       res
@@ -218,7 +223,6 @@ const userController = {
         .json({ error, message: "An error occurred during login" });
     }
   },
-  
 
   // <<<<<<<<<<<VERSI THEN CATCH>>>>>>>>>>>>
 
@@ -254,7 +258,7 @@ const userController = {
 
   updateDataUser: async (req, res) => {
     try {
-      const  users_id  = req.params.users_id;
+      const users_id = req.params.users_id;
       // console.log(req);
       const userImage = await cloudinary.uploader.upload(req.file.path, {
         folder: "user",
@@ -263,10 +267,8 @@ const userController = {
       const user = result.rows[0];
       const data = {
         username: req.body.username ?? user.username,
-        password: req.body.password ?? user.password,
         phone_number: req.body.phone_number ?? user.phone_number,
         image: userImage.secure_url ?? null,
-        role: req.body.role ?? user.role,
       };
 
       await updateUser(data, Number(users_id));

@@ -66,8 +66,8 @@ const loginUser = (email) => {
 
 
 const updateUser = (data, users_id) => {
-    const { username, password, phone_number, image, role } = data;
-    return db.query(`UPDATE users SET username='${username}', password='${password}', phone_number='${phone_number}',image='${image}',role = ${role} WHERE users.users_id = ${users_id}`);
+    const { username, phone_number, image } = data;
+    return db.query(`UPDATE users SET username='${username}', phone_number='${phone_number}',image='${image}' WHERE users.users_id = ${users_id}`);
 };
 
 const deleteUser = (users_id) => {
