@@ -18,19 +18,31 @@ const pagination = (limit, offset) => {
 };
 
 
-const findById = (id) => {
-    return db.query(`SELECT * FROM users WHERE users.id=${id}`);
+const findById = (users_id) => {
+    return db.query(`SELECT * FROM users WHERE users.users_id=${users_id}`);
 };
 
-const verifyUser = (id) => {
-    return db.query(`UPDATE * FROM users SET verif=1 WHERE users.id=${id}`);
+const findUserEmail = (email) => {
+    return new Promise((resolve, reject) =>
+        db.query(`SELECT * FROM users WHERE users.email = '${email}'`,
+            (err, res) => {
+                if (!err) {
+                    resolve(res);
+                } else {
+                    reject(err.message);
+                }
+            })
+    );
 };
 
+const verifyUser = (users_id) => {
+    return db.query(`UPDATE * FROM users SET verif=1 WHERE users.users_id=${users_id}`);
+};
 
 const createUser = (data) => {
     const { email, phone_number, username, password, role } = data;
     return new Promise((resolve, reject) =>
-        db.query(`INSERT INTO users(email, username, password, phone_number,role) VALUES('${email}', '${username}', '${password}', '${phone_number}',${role})`, (err, res) => {
+        db.query(`INSERT INTO users(email,phone_number,username, password,role) VALUES('${email}','${phone_number}', '${username}', '${password}', ${role})`, (err, res) => {
             if (!err) {
                 resolve(res);
             } else {
@@ -40,10 +52,10 @@ const createUser = (data) => {
     );
 };
 
-const loginUser = (username) => {
+const loginUser = (email) => {
     return new Promise((resolve, reject) => {
         db.query(
-            `SELECT * FROM users WHERE username = '${username}'`,
+            `SELECT * FROM users WHERE email = '${email}'`,
             (err, res) => {
                 if (err) return reject(err);
                 resolve(res);
@@ -53,13 +65,13 @@ const loginUser = (username) => {
 };
 
 
-const updateUser = (data, id) => {
+const updateUser = (data, users_id) => {
     const { username, password, phone_number, image, role } = data;
-    return db.query(`UPDATE users SET username='${username}', password='${password}', phone_number='${phone_number}',image='${image}',role = ${role} WHERE users.id = ${id}`);
+    return db.query(`UPDATE users SET username='${username}', password='${password}', phone_number='${phone_number}',image='${image}',role = ${role} WHERE users.users_id = ${users_id}`);
 };
 
-const deleteUser = (id) => {
-    return db.query(`DELETE FROM users WHERE users.id=${id}`);
+const deleteUser = (users_id) => {
+    return db.query(`DELETE FROM users WHERE users.users_id=${users_id}`);
 };
 
 
@@ -67,5 +79,4 @@ const deleteUser = (id) => {
 
 
 
-
-module.exports = { readUser, findById, createUser, loginUser, updateUser, deleteUser, verifyUser, selectPagination, pagination };
+module.exports = { readUser, findById, createUser, loginUser, updateUser, deleteUser, verifyUser, selectPagination, pagination,findUserEmail};

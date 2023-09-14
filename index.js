@@ -9,11 +9,12 @@ const mainRouter = require("./src/router/mainRouter");
 
 
 const PORT = 3002;
-app.use(bodyParser.json());
-app.use(mainRouter);
 app.use(cors());
 app.use(helmet());
 app.use(xssclean());
+app.use(bodyParser.json());
+app.use(mainRouter);
+
 
 
 app.get("/", (req, res) => {

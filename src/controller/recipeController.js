@@ -1,4 +1,4 @@
-const { findRecipesId, recipesQuery, createRecipes, updateRecipes, deleteRecipes } = require("../model/recipeModel");
+const { findRecipesId, recipesQuery, createRecipes, updateRecipes, deleteRecipes,getRecipesByUsersId, AllRecipes } = require("../model/recipeModel");
 const cloudinary = require("../config/cloudinaryConfig");
 const recipeController = {
 
@@ -27,13 +27,43 @@ const recipeController = {
         }
     },
 
+    getAllRecipes: async (req, res) => {
+        try {
+            let result = await AllRecipes();
+            res.json({
+                message: "Recipe has been read successfully",
+                data: result.rows
+            });
+        } catch (err) {y
+            res.json({
+                error: err.message,
+                message: "error reading Recipe"
+            });
+        }
+    },
+
     findById: async (req, res) => {
-        const id = req.params.id;
+        const recipe_id = req.params.recipe_id;
         try {
 
-            let result = await findRecipesId(id);
+            let result = await findRecipesId(recipe_id);
             res.status(200).json({ data: result.rows });
-            // console.log(result);
+            console.log(result);
+        }
+        catch (err) {
+            res.status(400).json({
+                error: err.message,
+                message: "error finding recipes"
+            });
+        }
+    },
+
+    findByUsersId: async (req, res) => {
+        const user_id = req.params.user_id;
+        try {
+            const result = await getRecipesByUsersId(user_id);
+            res.status(200).json({data:result.rows});
+            console.log(result);
         }
         catch (err) {
             res.status(400).json({
@@ -78,7 +108,7 @@ const recipeController = {
     },
 
     putRecipes: async (req, res) => {
-        let { id } = req.params;
+        let { recipe_id } = req.params;
         let recipesImage = await cloudinary.uploader.upload(req.file.path, { folder: "recipe" });
 
         if (!recipesImage) {
@@ -87,7 +117,7 @@ const recipeController = {
 
 
         try {
-            let recipe = await findRecipesId(Number(id));
+            let recipe = await findRecipesId(Number(recipe_id));
             let data = recipe.rows[0];
             // console.log(data);
             let recipeData = {
@@ -116,8 +146,8 @@ const recipeController = {
 
 
         try {
-            let { id } = req.params;
-            const result = await deleteRecipes(id);
+            let { recipe_id } = req.params;
+            const result = await deleteRecipes(recipe_id);
             const data = await cloudinary.uploader.destroy(result);
 
 
