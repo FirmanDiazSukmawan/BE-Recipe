@@ -15,7 +15,7 @@ router.get("/:users_id", getUserById);
 // router.get("/:id", getUserByPayload);
 router.post("/login", login);
 router.post("/", createUser);
-router.put("/:id", upload, updateDataUser);
-router.delete("/:id", deleteDataUser);
+router.put("/:users_id", upload, updateDataUser);
+router.delete("/:users_id", deleteDataUser);
 
 module.exports = router;

@@ -34,7 +34,7 @@ const recipeController = {
                 message: "Recipe has been read successfully",
                 data: result.rows
             });
-        } catch (err) {y
+        } catch (err) {
             res.json({
                 error: err.message,
                 message: "error reading Recipe"
@@ -108,7 +108,7 @@ const recipeController = {
     },
 
     putRecipes: async (req, res) => {
-        let { recipe_id } = req.params;
+        let recipe_id = req.params.recipe_id;
         let recipesImage = await cloudinary.uploader.upload(req.file.path, { folder: "recipe" });
 
         if (!recipesImage) {
@@ -129,7 +129,7 @@ const recipeController = {
                 description: req.body.description || data.description
             };
             // console.log(recipeData);
-            await updateRecipes(recipeData, Number(id));
+            await updateRecipes(recipeData, Number(recipe_id));
             res.status(200).json({
                 message: "recipe updated successfully"
             });
@@ -146,7 +146,7 @@ const recipeController = {
 
 
         try {
-            let { recipe_id } = req.params;
+            let recipe_id = req.params.recipe_id;
             const result = await deleteRecipes(recipe_id);
             const data = await cloudinary.uploader.destroy(result);
 

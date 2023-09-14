@@ -45,13 +45,13 @@ const createRecipes = (data) => {
     });
 };
 
-const updateRecipes = (data, id) => {
+const updateRecipes = (data, recipe_id) => {
     const { name_recipes, image, ingredients, users_id, category_id, description } = data;
-    return db.query(`UPDATE food_recipes SET name_recipes = '${name_recipes}', image = '${image}',ingredients= '${ingredients}',users_id=${users_id},category_id = ${category_id},created_at = CURRENT_TIMESTAMP ,description = '${description}' WHERE food_recipes.recipes_id=${id}`);
+    return db.query(`UPDATE food_recipes SET name_recipes = '${name_recipes}', image = '${image}',ingredients= '${ingredients}',users_id=${users_id},category_id = ${category_id},created_at = CURRENT_TIMESTAMP ,description = '${description}' WHERE food_recipes.recipes_id=${recipe_id}`);
 
 };
 
 const deleteRecipes = (recipes_id) => {
-    return db.query(`DELETE FROM food_recipes WHERE food_recipes.id = ${recipes_id}`);
+    return db.query(`DELETE FROM food_recipes WHERE food_recipes.recipes_id = ${recipes_id}`);
 };
 module.exports = { findRecipesId, recipesQuery, createRecipes, updateRecipes, deleteRecipes,getRecipesByUsersId,AllRecipes };
